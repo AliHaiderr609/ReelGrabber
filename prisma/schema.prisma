@@ -1,0 +1,154 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  username  String?  @unique
+  password  String
+  tier      UserTier @default(FREE)
+  apiKey    String?  @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  downloads     Download[]
+  apiUsage      ApiUsage[]
+  subscriptions Subscription[]
+
+  @@map("users")
+}
+
+model Download {
+  id          String   @id @default(cuid())
+  userId      String?
+  url         String
+  contentType ContentType
+  status      DownloadStatus @default(PENDING)
+  metadata    Json?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("downloads")
+}
+
+model ApiUsage {
+  id        String   @id @default(cuid())
+  userId    String
+  endpoint  String
+  method    String
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("api_usage")
+}
+
+model Subscription {
+  id            String           @id @default(cuid())
+  userId        String
+  plan          SubscriptionPlan
+  status        SubscriptionStatus @default(ACTIVE)
+  stripeId      String?          @unique
+  currentPeriodStart DateTime?
+  currentPeriodEnd   DateTime?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("subscriptions")
+}
+
+model RateLimit {
+  id        String   @id @default(cuid())
+  identifier String  // IP address or user ID
+  tier      UserTier
+  count     Int      @default(0)
+  windowStart DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([identifier, tier])
+  @@map("rate_limits")
+}
+
+model Proxy {
+  id       String @id @default(cuid())
+  host     String
+  port     Int
+  username String?
+  password String?
+  isActive Boolean @default(true)
+  lastUsed DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("proxies")
+}
+
+model Analytics {
+  id          String   @id @default(cuid())
+  date        DateTime @default(now())
+  downloads   Int      @default(0)
+  uniqueUsers Int      @default(0)
+  errors      Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  @@unique([date])
+  @@map("analytics")
+}
+
+enum UserTier {
+  FREE
+  PRO
+  ENTERPRISE
+}
+
+enum ContentType {
+  VIDEO
+  PHOTO
+  REEL
+  STORY
+  IGTV
+}
+
+enum DownloadStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum SubscriptionPlan {
+  FREE
+  PRO_MONTHLY
+  PRO_YEARLY
+  ENTERPRISE_MONTHLY
+  ENTERPRISE_YEARLY
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+  PAST_DUE
+  UNPAID
+}
