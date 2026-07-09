@@ -1,0 +1,10 @@
+node_modules
+.next
+.turbo
+dist
+build
+coverage
+**/generated/**
+**/*.lock
+package-lock.json
+save-clip-v1.zip

@@ -1,0 +1,43 @@
+{
+  "name": "@reelgrabber/api-gateway",
+  "version": "0.1.0",
+  "private": true,
+  "description": "NestJS API gateway — validates URLs, detects platform, enqueues extraction jobs. No extraction logic.",
+  "scripts": {
+    "build": "rimraf dist && nest build",
+    "dev": "nest start --watch",
+    "start": "node dist/main.js",
+    "start:prod": "node dist/main.js",
+    "lint": "tsc --noEmit",
+    "test": "tsc -p tsconfig.spec.json && node --test dist-test/**/*.test.js"
+  },
+  "dependencies": {
+    "@nestjs/common": "^11.0.0",
+    "@nestjs/core": "^11.0.0",
+    "@nestjs/platform-express": "^11.0.0",
+    "@nestjs/throttler": "^6.4.0",
+    "@reelgrabber/config": "*",
+    "@reelgrabber/database": "*",
+    "@reelgrabber/logger": "*",
+    "@reelgrabber/monitoring": "*",
+    "@reelgrabber/queue": "*",
+    "@reelgrabber/shared": "*",
+    "@reelgrabber/types": "*",
+    "@reelgrabber/validation": "*",
+    "helmet": "^8.0.0",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.1",
+    "uuid": "^9.0.1",
+    "zod": "^3.22.4",
+    "dotenv": "^16.4.7"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^11.0.0",
+    "@nestjs/schematics": "^11.0.0",
+    "@types/express": "^5.0.0",
+    "@types/node": "^20.10.5",
+    "@types/uuid": "^9.0.7",
+    "typescript": "^5.3.3",
+    "rimraf": "^6.0.1"
+  }
+}

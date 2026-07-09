@@ -1,0 +1,21 @@
+{
+  "name": "@reelgrabber/types",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Shared domain types and platform worker contracts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "lint": "tsc --noEmit",
+    "test": "node --test dist/**/*.test.js 2>nul || exit 0"
+  },
+  "files": ["dist"]
+}

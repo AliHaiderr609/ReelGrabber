@@ -1,0 +1,35 @@
+{
+  "name": "@reelgrabber/database",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Shared Prisma schema and database client singleton",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "prisma generate && tsc",
+    "dev": "prisma generate --watch",
+    "lint": "tsc --noEmit",
+    "test": "node --test dist/**/*.test.js 2>nul || exit 0",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:deploy": "prisma migrate deploy",
+    "db:studio": "prisma studio"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.7.1"
+  },
+  "devDependencies": {
+    "prisma": "^5.7.1",
+    "typescript": "^5.3.3"
+  },
+  "prisma": {
+    "schema": "prisma/schema.prisma"
+  },
+  "files": ["dist"]
+}

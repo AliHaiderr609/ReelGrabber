@@ -1,13 +1,45 @@
-/node_modules
-/dist
-/build
-/coverage
-/logs
-/temp
-/cache
-/backup
-/old
-/temp
-/cache
-/backup
-/old
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+.turbo/
+
+# Test / coverage
+coverage/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Caches / temp
+temp/
+cache/
+.cache/
+
+# Backups
+backup/
+old/
+save-clip-v1/
+save-clip-v1.zip
+
+# Environment (never commit secrets)
+.env
+.env.*
+!.env.example
+
+# Python (workers)
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+
+# OS / editor
+.DS_Store
+Thumbs.db

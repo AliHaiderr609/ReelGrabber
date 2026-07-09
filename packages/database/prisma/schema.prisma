@@ -1,0 +1,230 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  username  String?  @unique
+  password  String
+  tier      UserTier @default(FREE)
+  apiKey    String?  @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  downloads    Download[]
+  downloadJobs DownloadJob[]
+  apiUsage     ApiUsage[]
+  subscriptions Subscription[]
+  sessions     Session[]
+
+  @@map("users")
+}
+
+model Download {
+  id          String         @id @default(cuid())
+  userId      String?
+  url         String
+  contentType ContentType
+  status      DownloadStatus @default(PENDING)
+  metadata    Json?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("downloads")
+}
+
+model DownloadJob {
+  id            String        @id @default(cuid())
+  requestId     String
+  userId        String?
+  url           String
+  normalizedUrl String
+  platform      MediaPlatform
+  status        JobStatus     @default(QUEUED)
+  bullJobId     String?
+  error         String?
+  result        Json?
+  workerVersion String?
+  durationMs    Int?
+  retries       Int           @default(0)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  completedAt   DateTime?
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([status])
+  @@index([platform])
+  @@index([requestId])
+  @@map("download_jobs")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String   @unique
+  expiresAt DateTime
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model ApiUsage {
+  id        String   @id @default(cuid())
+  userId    String
+  endpoint  String
+  method    String
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("api_usage")
+}
+
+model Subscription {
+  id                 String             @id @default(cuid())
+  userId             String
+  plan               SubscriptionPlan
+  status             SubscriptionStatus @default(ACTIVE)
+  stripeId           String?            @unique
+  currentPeriodStart DateTime?
+  currentPeriodEnd   DateTime?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("subscriptions")
+}
+
+model RateLimit {
+  id          String   @id @default(cuid())
+  identifier  String
+  tier        UserTier
+  count       Int      @default(0)
+  windowStart DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([identifier, tier])
+  @@map("rate_limits")
+}
+
+model Proxy {
+  id        String    @id @default(cuid())
+  host      String
+  port      Int
+  username  String?
+  password  String?
+  isActive  Boolean   @default(true)
+  lastUsed  DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@map("proxies")
+}
+
+model Analytics {
+  id          String   @id @default(cuid())
+  date        DateTime @default(now())
+  downloads   Int      @default(0)
+  uniqueUsers Int      @default(0)
+  errors      Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  @@unique([date])
+  @@map("analytics")
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  action    String
+  actorId   String?
+  metadata  Json?
+  ipAddress String?
+  createdAt DateTime @default(now())
+
+  @@index([action])
+  @@map("audit_logs")
+}
+
+model PlatformStatistic {
+  id        String        @id @default(cuid())
+  platform  MediaPlatform
+  date      DateTime      @default(now())
+  jobsTotal Int           @default(0)
+  jobsFailed Int          @default(0)
+  avgDurationMs Int?
+  createdAt DateTime      @default(now())
+
+  @@unique([platform, date])
+  @@map("platform_statistics")
+}
+
+enum UserTier {
+  FREE
+  PRO
+  ENTERPRISE
+}
+
+enum ContentType {
+  VIDEO
+  PHOTO
+  REEL
+  STORY
+  IGTV
+}
+
+enum DownloadStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum SubscriptionPlan {
+  FREE
+  PRO_MONTHLY
+  PRO_YEARLY
+  ENTERPRISE_MONTHLY
+  ENTERPRISE_YEARLY
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+  PAST_DUE
+  UNPAID
+}
+
+enum MediaPlatform {
+  INSTAGRAM
+  TIKTOK
+  FACEBOOK
+  TWITTER
+  PINTEREST
+  THREADS
+}
+
+enum JobStatus {
+  QUEUED
+  PROCESSING
+  COMPLETED
+  FAILED
+}
