@@ -779,7 +779,8 @@ async function extractWithPuppeteer(url: string, targetShortcode: string | null 
             const responseStr = JSON.stringify(responseData);
             if (responseData?.data?.shortcode_media?.shortcode === responseTargetShortcode ||
                 responseData?.data?.reel?.shortcode === responseTargetShortcode ||
-                responseStr.includes(`"shortcode":"${responseTargetShortcode}"`)) {
+                responseStr.includes(`"shortcode":"${responseTargetShortcode}"`) ||
+                responseStr.includes(`"code":"${responseTargetShortcode}"`)) {
               isTargetPost = true;
               console.log(`GraphQL response matches target shortcode: ${responseTargetShortcode}`);
             } else {
@@ -989,9 +990,9 @@ async function extractWithPuppeteer(url: string, targetShortcode: string | null 
     });
 
     // Navigate to the Instagram URL
-    await page.goto(url, { 
-      waitUntil: 'networkidle2',
-      timeout: 30000 
+    await page.goto(url, {
+      waitUntil: 'domcontentloaded',
+      timeout: 60000,
     });
 
     // Wait longer for videos to load and try to trigger video loading
@@ -1075,7 +1076,7 @@ async function extractWithPuppeteer(url: string, targetShortcode: string | null 
     console.log('Page HTML length:', pageHtml.length);
     
     // Only parse HTML if it contains the target shortcode (or no target specified)
-    if (!targetShortcode || pageHtml.includes(`"shortcode":"${targetShortcode}"`) || pageHtml.includes(`/reel/${targetShortcode}/`) || pageHtml.includes(`/p/${targetShortcode}/`)) {
+    if (!targetShortcode || pageHtml.includes(`"shortcode":"${targetShortcode}"`) || pageHtml.includes(`"code":"${targetShortcode}"`) || pageHtml.includes(`/reel/${targetShortcode}/`) || pageHtml.includes(`/p/${targetShortcode}/`)) {
       // Try to extract video URLs from raw HTML
       // Comprehensive patterns based on SaveClip.app analysis
       const htmlVideoUrlPatterns = [
@@ -1359,7 +1360,7 @@ async function extractWithPuppeteer(url: string, targetShortcode: string | null 
             const dataStr = JSON.stringify(data);
             
             // Only extract if this script contains the target shortcode
-            if (targetShortcode && !dataStr.includes(`"shortcode":"${targetShortcode}"`)) {
+            if (targetShortcode && !dataStr.includes(`"shortcode":"${targetShortcode}"`) && !dataStr.includes(`"code":"${targetShortcode}"`)) {
               continue; // Skip scripts that don't contain the target shortcode
             }
             
@@ -1390,7 +1391,7 @@ async function extractWithPuppeteer(url: string, targetShortcode: string | null 
           const text = script.textContent || '';
           
           // Only extract if this script contains the target shortcode
-          if (targetShortcode && !text.includes(`"shortcode":"${targetShortcode}"`)) {
+          if (targetShortcode && !text.includes(`"shortcode":"${targetShortcode}"`) && !text.includes(`"code":"${targetShortcode}"`)) {
             continue; // Skip scripts that don't contain the target shortcode
           }
           

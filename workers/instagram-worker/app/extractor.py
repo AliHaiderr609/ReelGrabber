@@ -104,20 +104,28 @@ async def extract_media(url: str) -> list[dict]:
             }
         )
 
-    # Fallback: look for video_url in embedded JSON
+    # Fallback: look for video URLs in embedded JSON (reels often use video_versions)
     if not items:
-        match = re.search(r'"video_url":"([^"]+)"', html)
-        if match:
-            video_url = match.group(1).encode("utf-8").decode("unicode_escape")
-            items.append(
-                {
-                    "type": content_type if content_type != "photo" else "video",
-                    "url": video_url,
-                    "thumbnail": og_image,
-                    "title": og_title,
-                    "description": og_description,
-                }
-            )
+        for pattern in (
+            r'"video_url":"([^"]+)"',
+            r'"playback_url":"([^"]+)"',
+            r'"url":"(https://[^"]+\.mp4[^"]*)"',
+        ):
+            for match in re.finditer(pattern, html):
+                raw_url = match.group(1).encode("utf-8").decode("unicode_escape")
+                if "cdninstagram.com" in raw_url and ".mp4" in raw_url:
+                    items.append(
+                        {
+                            "type": content_type if content_type != "photo" else "video",
+                            "url": raw_url,
+                            "thumbnail": og_image,
+                            "title": og_title,
+                            "description": og_description,
+                        }
+                    )
+                    break
+            if items:
+                break
 
     return items
 

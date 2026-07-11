@@ -1,6 +1,9 @@
 import time
 
+from dotenv import load_dotenv
 from fastapi import FastAPI, Header, HTTPException
+
+load_dotenv()
 
 from app.extractor import WORKER_VERSION, extract_media, normalize, validate
 from app.schemas import ExtractRequest, ExtractResponse, MediaItem
