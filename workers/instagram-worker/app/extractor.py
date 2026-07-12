@@ -104,6 +104,7 @@ async def extract_media(url: str) -> list[dict]:
             }
         )
 
+
     # Fallback: look for video URLs in embedded JSON (reels often use video_versions)
     if not items:
         for pattern in (
