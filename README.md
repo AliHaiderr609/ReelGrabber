@@ -27,6 +27,7 @@ Tooling: [Turborepo](https://turbo.build) orchestrates tasks across npm workspac
 TypeScript/JS packages are npm workspaces; Python workers are managed separately and
 orchestrated by Turborepo.
 
+
 ## Prerequisites
 
 - Node.js >= 18 (currently developed on Node 24)
