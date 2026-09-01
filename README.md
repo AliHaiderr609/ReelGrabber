@@ -53,7 +53,6 @@ npm run dev            # runs all workspace dev tasks
 # or just the web app:
 npm run web
 ```
-
 The web app runs at http://localhost:3000.
 The API gateway runs at http://localhost:4000 (`npm run gateway`).
 The Instagram worker runs at http://localhost:8001 (see `workers/instagram-worker/README.md`).
